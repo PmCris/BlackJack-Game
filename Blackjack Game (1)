@@ -1,0 +1,233 @@
+"""
+Program Name: Blackjack / Project 2
+Programmer Name: Cristhofer Moscoso
+Date Submitted: 11/28/20
+Purpose: Create a Blackjack game in Python. Allow the player to play over and over again until the player wishes to stop
+Date Updated:
+Purpose for Update:
+"""
+import random
+
+new_faces_dealer = []
+new_faces_player = []
+dealer_hand = []
+player_hand = []
+won_games = []
+lost_games = []
+tied_games = []
+new_run = 0
+
+
+# Precondition: faces and suits are set as given in project assignment
+# Postcondition: Returns a shuffled deck of 52 playing cards
+def shuffle_cards(faces, suits):
+    card_deck = []
+    for suit in suits:
+        for face in faces:
+            card_deck.append(face + suit)
+    random.shuffle(card_deck)
+    # Shuffle again just to make it appear more random
+    random.shuffle(card_deck)
+    return card_deck
+
+
+# Precondition: Cards are shuffled
+# Postconditon: A random card is removed from the shuffled deck
+def pop_cards():
+    card_deck = shuffle_cards(faces, suits)
+    card_deal = card_deck.pop()
+    return card_deal
+
+
+# Precondition: Takes in all the face values of cards in the dealer's deck
+# Postcondition: Changes all the values into integers
+def change_face_values_dealer(face_values):
+    for face in face_values:
+        if face == "K" or face == "Q" or face == "J" or face == "T":
+            new_face = face.replace(face, "10")
+            new_faces_dealer.append(new_face)
+        elif face == "A":
+            new_face = face.replace(face, "1")
+            new_faces_dealer.append(new_face)
+        elif face != "K" or face != "Q" or face != "J" or face != "T":
+            new_faces_dealer.append(face)
+    for face in range(0, len(new_faces_dealer)):
+        new_faces_dealer[face] = int(new_faces_dealer[face])
+    return new_faces_dealer
+
+
+# Precondition: Takes in all the face values of cards in the player's deck
+# Postcondition: Changes all the values into integers
+def change_face_values_player(face_values):
+    for face in face_values:
+        if face == "K" or face == "Q" or face == "J" or face == "T":
+            new_face = face.replace(face, "10")
+            new_faces_player.append(new_face)
+        elif face == "A":
+            new_face = face.replace(face, "1")
+            new_faces_player.append(new_face)
+        elif face != "K" or face != "Q" or face != "J" or face != "T":
+            new_faces_player.append(face)
+    for face in range(0, len(new_faces_player)):
+        new_faces_player[face] = int(new_faces_player[face])
+    return new_faces_player
+
+
+# Precondition: A random card is taken from the shuffled deck
+# Postcondtion: The card is added to the dealer's deck and the face values are added.
+def dealer_card_to_face():
+    dealer_deck = list(pop_cards())
+    new_dealer_deal = [''.join(face_suit) for face_suit in zip(dealer_deck[0::2], dealer_deck[1::2])]
+    face_values = dealer_deck[::2]
+    face_ints = change_face_values_dealer(face_values)
+    sum(face_ints)
+    new_print = (", ".join(new_dealer_deal))
+    if sum(face_ints) < 17:  # To follow dealer rules
+        dealer_hand.append(new_print)
+        dealer_hand_print = (", ".join(dealer_hand))
+        print('You know the dealer has: {}'.format((dealer_hand_print[0:2])))
+    else:
+        dealer_hand_print = (", ".join(dealer_hand))
+        print('You know the dealer has: {}'.format((dealer_hand_print[0:2])))
+
+    return ''
+
+
+# Precondition: Two random cards are taken
+# Postcondition: The cards are added to the player's deck and the face values are added
+def player_card_to_face():
+    global new_run
+    if new_run == 0:  # first run always draw 2 cards
+        player_deck = list(pop_cards()) + list(pop_cards())
+    else:  # Second run always draw 1 cards
+        player_deck = list(pop_cards())
+
+    new_player_deal = [''.join(face_suit) for face_suit in zip(player_deck[0::2], player_deck[1::2])]
+    face_values = player_deck[::2]
+    face_ints = change_face_values_player(face_values)
+    sum(face_ints)
+    new_print = (", ".join(new_player_deal))
+    player_hand.append(new_print)
+    player_hand_print = (", ".join(player_hand))
+    print('You have: {}'.format(player_hand_print))
+
+    new_run = + 1
+    return ''
+
+
+# Precondition: User is prompted to hit or stand
+# Postcondition: Round is looped if hit, round ends if stand
+def hit_or_stand():
+    # start of game cards for player and dealer
+
+    while True:
+        print(dealer_card_to_face(), end='')
+        print(player_card_to_face(), end='')
+        print('Choose')
+        print('    S: Stand')
+        print('    H: Hit')
+        user_input = input(': ')
+        if user_input == 'H':
+            continue
+        elif user_input == 'h':
+            continue
+        elif user_input == 'S' or 's':
+            print('')
+            print('Round over')
+            # more conditions here
+            if (sum(new_faces_dealer) < sum(new_faces_player)) and (sum(new_faces_player) < 21):
+                print('Dealer Had: {} for a total of {}'.format(" , ".join(dealer_hand), sum(new_faces_dealer)))
+                print('You had: {} for a total of {}'.format(", ".join(player_hand), sum(new_faces_player)))
+                print('You win!')
+                new_faces_dealer.clear()
+                new_faces_player.clear()
+                dealer_hand.clear()
+                player_hand.clear()
+                game_response = input('Play again, y or n?')
+                won_games.append(1)
+                if game_response == 'Y':
+                    hit_or_stand()
+                elif game_response == 'y':
+                    hit_or_stand()
+                elif game_response == 'N':
+                    print('Game Over')
+                    print(statistics())
+                    break
+                elif game_response == 'n':
+                    print('Game Over')
+                    print(statistics())
+                    break
+                else:
+                    print('That was not a valid response')
+            elif (sum(new_faces_dealer) > sum(new_faces_player)) or (sum(new_faces_player) > 21):
+                print('Dealer Had: {} for a total of {}'.format(", ".join(dealer_hand), sum(new_faces_dealer)))
+                print('You had: {} for a total of {}'.format(", ".join(player_hand), sum(new_faces_player)))
+                print('You lose!')
+                new_faces_dealer.clear()
+                new_faces_player.clear()
+                dealer_hand.clear()
+                player_hand.clear()
+                game_response = input('Play again, y or n?')
+                lost_games.append(1)
+                if game_response == 'Y':
+                    hit_or_stand()
+                elif game_response == 'y':
+                    hit_or_stand()
+                elif game_response == 'N':
+                    print('Game Over')
+                    print(statistics())
+                elif game_response == 'n':
+                    print('Game Over')
+                    print(statistics())
+                    break
+                else:
+                    print('That was not a valid response')
+            elif sum(new_faces_dealer) == sum(new_faces_player):
+                print('TIE')
+                print('Dealer Had: {} for a total of {}'.format(", ".join(dealer_hand), sum(new_faces_dealer)))
+                print('You had: {} for a total of {}'.format(", ".join(player_hand), sum(new_faces_player)))
+                new_faces_dealer.clear()
+                new_faces_player.clear()
+                dealer_hand.clear()
+                player_hand.clear()
+                game_response = input('Play again, y or n?')
+                tied_games.append(1)
+                if game_response == 'Y':
+                    hit_or_stand()
+                if game_response == 'y':
+                    hit_or_stand()
+                elif game_response == 'N':
+                    print('Game Over')
+                    print(statistics())
+                    break
+                elif game_response == 'n':
+                    print('Game Over')
+                    print(statistics())
+                    break
+                else:
+                    print('That was not a valid response')
+            continue
+        else:
+            print('Invalid Input')
+            continue
+
+
+# Precondition: Round ends
+# Postcondition: Round result is saved on a list and then shown in the end
+def statistics():
+    print('Statistics:')
+    print('Won: {}'.format(sum(won_games)))
+    print('Lost: {}'.format(sum(lost_games)))
+    print('Tied: {}'.format(sum(tied_games)))
+    return ''
+
+
+# Added functions can go here
+
+
+if __name__ == "__main__":
+    faces = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+             'T': 10, 'A': [1, 11], 'J': 10, 'Q': 10, 'K': 10}
+    suits = ['♠', '♥', '♦', '♣']
+
+    print((hit_or_stand()))
